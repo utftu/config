@@ -3,12 +3,8 @@ add_line_uniq() {
   local line="$2"
 
   # Проверка наличия строки в файле
-  if grep -Fxq "$line" "$path_to_file"; then
-    echo "Строка уже существует: $line"
-  else
-    # Если строки нет, добавляем её в конец файла
+  if ! grep -Fxq "$line" "$path_to_file"; then
     echo "$line" >> "$path_to_file"
-    echo "Строка добавлена: $line"
   fi
 }
 
