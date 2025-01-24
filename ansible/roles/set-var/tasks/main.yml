@@ -1,0 +1,7 @@
+- name: Выполнить команду
+  shell: "{{ command }}"
+  register: command_output
+
+- name: Создать переменную на основе результата команды
+  set_fact:
+    {{ name }}: "{{ command_output.stdout }}"
