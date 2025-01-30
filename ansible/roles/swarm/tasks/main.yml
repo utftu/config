@@ -1,0 +1,14 @@
+- name: "123"
+  include_role: 
+    name: cs
+  vars:
+    command: echo $USER
+
+- name: Проверить состояние Docker Swarm
+  command: docker info --format '{{"{{.Swarm.LocalNodeState}}"}}'
+  register: docker_swarm_state
+  changed_when: false
+
+- name: Инициализировать Docker Swarm, если не инициализирован
+  command: docker swarm init --advertise-addr {{ ansible_default_ipv4.address }}
+  when: docker_swarm_state.stdout != 'active'

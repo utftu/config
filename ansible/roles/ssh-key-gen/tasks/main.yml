@@ -1,0 +1,33 @@
+# key_dir
+# key_name
+
+- name: Убедиться, что директория для SSH ключей существует
+  become: false
+  ansible.builtin.file:
+    path: "{{ key_dir }}"
+    state: directory
+    mode: '0700'
+  delegate_to: localhost  # Выполняется на локальной машине от имени текущего пользователя
+
+- name: Создать SSH ключ
+  become: false
+  ansible.builtin.openssh_keypair:
+    path: "{{ key_dir }}}/{{ key_name }}"
+    type: ed25519
+    mode: '0600'
+    state: present
+    comment: "{{ key_name }}"
+  delegate_to: localhost  # Выполняется на локальной машине от имени текущего пользователя
+
+- name: Прочитать публичный ключ
+  become: false
+  ansible.builtin.slurp:
+    src: "./{{ key_dir }}/{{ key_name }}.pub"
+  register: public_key_data
+  delegate_to: localhost  # Выполняется на локальной машине от имени текущего пользователя
+
+- name: Добавить публичный ключ в authorized_keys на удалённой машине
+  ansible.builtin.authorized_key:
+    user: ansible
+    state: present
+    key: "{{ public_key_data['content'] | b64decode }}"
