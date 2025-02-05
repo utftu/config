@@ -12,7 +12,7 @@
 - name: Создать SSH ключ
   become: false
   ansible.builtin.openssh_keypair:
-    path: '{{ key_dir }}}/{{ key_name }}'
+    path: '{{ key_dir }}/{{ key_name }}'
     type: ed25519
     mode: '0600'
     state: present
