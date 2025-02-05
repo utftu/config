@@ -1,5 +1,6 @@
 # key_dir
 # key_name
+# user
 
 - name: Убедиться, что директория для SSH ключей существует
   become: false
@@ -28,5 +29,6 @@
 
 - name: Добавить публичный ключ в authorized_keys на удалённой машине
   ansible.builtin.authorized_key:
+    user: '{{ user }}'
     state: present
     key: "{{ public_key_data['content'] | b64decode }}"
