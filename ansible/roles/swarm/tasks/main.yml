@@ -1,9 +1,3 @@
-- name: "123"
-  include_role: 
-    name: cs
-  vars:
-    command: echo $USER
-
 - name: Проверить состояние Docker Swarm
   command: docker info --format '{{"{{.Swarm.LocalNodeState}}"}}'
   register: docker_swarm_state
