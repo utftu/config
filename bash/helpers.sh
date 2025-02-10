@@ -1,3 +1,7 @@
+test_empty() {
+  return 0
+}
+
 add_line_uniq() {
   local path_to_file="$1"
   local line="$2"
