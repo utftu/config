@@ -1,0 +1,59 @@
+- name: Разбить путь на директорию и имя файла
+  hosts: localhost
+  gather_facts: false
+  vars_prompt:
+    - name: user
+      prompt: "Введите имя пользователя"
+      private: false
+      default: "ansible"
+    - name: full_path
+      prompt: "Введите путь (например, ~/.ssh/ansible)"
+      private: false
+      default: "~/.ssh/ansible"
+  tasks:
+    - name: Разбить строку
+      set_fact:
+        ssh_dir: "{{ full_path | dirname }}"
+        ssh_name: "{{ full_path | basename }}"
+      delegate_to: localhost
+      run_once: true
+
+    - name: Вывести результаты
+      debug:
+        msg: "Директория: {{ ssh_dir }}, Файл: {{ ssh_name }}"
+
+- name: Создание пользователя ansible
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Убедиться, что пользователь существует
+      ansible.builtin.user:
+        name: "{{ user }}"
+        state: present
+        create_home: true
+        groups: sudo,docker
+        append: true
+
+- name: Управление пользователем и переключение
+  hosts: all
+  become: true
+  become_user: ansible
+  tasks:
+    - name: Вывести результаты 123
+      debug:
+        msg: "Директория: {{ ssh_dir }}, Файл: {{ ssh_name }}"
+    - name: Include custom tasks from my-role
+      include_role:
+        name: ssh-key
+      vars:
+        key_name: "{{ ssh_name }}"
+        key_dir: "{{ ssh_dir }}"
+    - name: Включить роль geerlingguy.docker
+      include_role:
+        name: geerlingguy.docker
+    - name: Включить роль swarm
+      include_role:
+        name: swarm
+    - name: Вывести факты Docker
+      debug:
+        var: docker_swarm_state.stdout
